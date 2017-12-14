@@ -1,0 +1,23 @@
+{
+  "name": "cordova-qdc-baidu-location",
+  "version": "1.0.0",
+  "description": "cordova plugin geoloaction with baidu SDK for android only",
+  "cordova": {
+    "id": "cordova-qdc-baidu-location",
+    "platforms": [
+      "android"
+    ]
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/xiaoyuanliao/cordova-qdc-baidu-location.git"
+  },
+  "keywords": [
+    "cordova",
+    "map",
+    "baidu",
+    "geolocation"
+  ],
+  "author": "xiaoyuan liao",
+  "license": "MIT"
+}

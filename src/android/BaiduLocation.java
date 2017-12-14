@@ -7,6 +7,7 @@ import org.apache.cordova.PluginResult;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.apache.cordova.PermissionHelper
 
 import com.baidu.location.BDLocation;
 import com.baidu.location.BDLocationListener;
@@ -30,6 +31,8 @@ public class BaiduLocation extends CordovaPlugin {
 
     /** 百度定位客户端 */
     public LocationClient mLocationClient = null;
+
+	String [] permissions = { Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION };
 
     /** 百度定位监听 */
     public BDLocationListener myListener = new BDLocationListener() {
@@ -121,7 +124,7 @@ public class BaiduLocation extends CordovaPlugin {
     //            }
                 LOG.i(LOG_TAG, sb.toString());
 
-                PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, sb.toString());
+                PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, json);
                 pluginResult.setKeepCallback(true);
                 cbCtx.sendPluginResult(pluginResult);
             } catch (JSONException e) {
@@ -146,6 +149,20 @@ public class BaiduLocation extends CordovaPlugin {
 
         boolean ret = false;
 
+		if(action.equals("getPermission"))
+        {
+            if(hasPermisssion())
+            {
+                PluginResult r = new PluginResult(PluginResult.Status.OK);
+                context.sendPluginResult(r);
+                return true;
+            }
+            else {
+                PermissionHelper.requestPermissions(this, 0, permissions);
+            }
+            return true;
+        }
+
         if ("getCurrentPosition".equalsIgnoreCase(action)) {
             cbCtx = callbackContext;
 
@@ -166,6 +183,37 @@ public class BaiduLocation extends CordovaPlugin {
         }
 
         return ret;
+    }
+
+	 public void onRequestPermissionResult(int requestCode, String[] permissions,
+                                          int[] grantResults) throws JSONException
+    {
+        PluginResult result;
+        //This is important if we're using Cordova without using Cordova, but we have the geolocation plugin installed
+        if(context != null) {
+            for (int r : grantResults) {
+                if (r == PackageManager.PERMISSION_DENIED) {
+                    LOG.d(TAG, "Permission Denied!");
+                    result = new PluginResult(PluginResult.Status.ILLEGAL_ACCESS_EXCEPTION);
+                    context.sendPluginResult(result);
+                    return;
+                }
+
+            }
+            result = new PluginResult(PluginResult.Status.OK);
+            context.sendPluginResult(result);
+        }
+    }
+
+    public boolean hasPermisssion() {
+        for(String p : permissions)
+        {
+            if(!PermissionHelper.hasPermission(this, p))
+            {
+                return false;
+            }
+        }
+        return true;
     }
 
     /**
